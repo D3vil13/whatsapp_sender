@@ -1,0 +1,189 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bulkping
+      POSTGRES_USER: bulkping
+      POSTGRES_PASSWORD: bulkping
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bulkping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.7
+    environment:
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-dev-evolution-key}
+      SERVER_URL: http://localhost:8080
+      WEBHOOK_GLOBAL_URL: ${WEBHOOK_GLOBAL_URL:-http://gateway/webhooks/evolution/}
+      WEBHOOK_GLOBAL_ENABLED: "true"
+      WEBHOOK_BY_EVENTS: "true"
+      WEBHOOK_GLOBAL_WEBHOOK_SECRET: ${WEBHOOK_SECRET:-dev-webhook-secret}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://bulkping:bulkping@postgres:5432/evolution
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://redis:6379
+      CACHE_LOCAL_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service
+      - instance-service
+      - contacts-service
+      - campaigns-service
+      - chatbot-service
+      - webhook-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: auth
+      DATABASE_SCHEMA: auth
+      SERVICE_PORT: 8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  instance-service:
+    build:
+      context: .
+      dockerfile: services/instance/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: instance
+      DATABASE_SCHEMA: instance
+      SERVICE_PORT: 8002
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      evolution-api:
+        condition: service_started
+
+  contacts-service:
+    build:
+      context: .
+      dockerfile: services/contacts/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: contacts
+      DATABASE_SCHEMA: contacts
+      SERVICE_PORT: 8003
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  campaigns-service:
+    build:
+      context: .
+      dockerfile: services/campaigns/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: campaigns
+      DATABASE_SCHEMA: campaigns
+      SERVICE_PORT: 8004
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  chatbot-service:
+    build:
+      context: .
+      dockerfile: services/chatbot/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: chatbot
+      DATABASE_SCHEMA: chatbot
+      SERVICE_PORT: 8005
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  webhook-service:
+    build:
+      context: .
+      dockerfile: services/webhook/Dockerfile
+    env_file: .env
+    environment:
+      SERVICE_NAME: webhook
+      DATABASE_SCHEMA: webhook
+      SERVICE_PORT: 8006
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    env_file: .env
+    command: celery -A worker.celery_app worker -l info -Q default,broadcast,chatbot,scheduled
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      evolution-api:
+        condition: service_started
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    env_file: .env
+    command: celery -A worker.celery_app beat -l info
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  streamlit-ui:
+    build:
+      context: .
+      dockerfile: apps/streamlit-ui/Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      API_BASE_URL: http://gateway
+    depends_on:
+      - gateway
+
+volumes:
+  postgres_data:
+  evolution_instances:

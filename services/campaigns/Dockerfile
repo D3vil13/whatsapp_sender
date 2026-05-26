@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev gcc && rm -rf /var/lib/apt/lists/*
+COPY packages/bulkping-common /packages/bulkping-common
+RUN pip install --no-cache-dir /packages/bulkping-common
+COPY services/campaigns/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY services/_base /app/services/_base
+COPY services/campaigns /app
+ENV PYTHONPATH=/app:/app/services/_base
+ENV DJANGO_SETTINGS_MODULE=config.settings
+EXPOSE 8004
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:${SERVICE_PORT:-8004} --workers 2"]
