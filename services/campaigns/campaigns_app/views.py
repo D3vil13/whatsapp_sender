@@ -104,7 +104,19 @@ class CampaignStatsView(DisclaimerRequiredMixin, APIView):
         except Campaign.DoesNotExist:
             return Response(status=404)
         data = _campaign_analytics(campaign)
-        data["logs"] = MessageLogSerializer(campaign.logs.all().order_by("contact_name"), many=True).data
+        logs_qs = campaign.logs.all().order_by("contact_name")
+        data["logs"] = MessageLogSerializer(logs_qs, many=True).data
+        by_status = {s.value: [] for s in MessageStatus}
+        for log in logs_qs:
+            by_status[log.status].append({
+                "id": str(log.id),
+                "contact_name": log.contact_name,
+                "contact_phone": log.contact_phone,
+                "status": log.status,
+                "wa_message_id": log.wa_message_id,
+                "status_updated_at": log.status_updated_at.isoformat() if log.status_updated_at else None,
+            })
+        data["by_status"] = by_status
         return Response(data)
 
 
@@ -257,3 +269,24 @@ class InternalReplyIncrementView(APIView):
             reply_count=F("reply_count") + 1
         )
         return Response({"ok": bool(updated)})
+
+
+class InternalReplyByPhoneView(APIView):
+    authentication_classes = [InternalServiceAuthentication]
+
+    def post(self, request):
+        sender_phone = request.data.get("sender_phone", "")
+        if not sender_phone:
+            return Response({"ok": False, "error": "sender_phone required"}, status=400)
+        log = (
+            MessageLog.objects.filter(contact_phone=sender_phone, status__in=("delivered", "read"))
+            .select_related("campaign")
+            .order_by("-created_at")
+            .first()
+        )
+        if not log:
+            return Response({"ok": False, "error": "no campaign log found for phone"})
+        Campaign.objects.filter(id=log.campaign_id).update(
+            reply_count=F("reply_count") + 1
+        )
+        return Response({"ok": True, "campaign_id": str(log.campaign_id)})

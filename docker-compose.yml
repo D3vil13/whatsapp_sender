@@ -29,8 +29,11 @@ services:
       SERVER_URL: http://localhost:8080
       WEBHOOK_GLOBAL_URL: ${WEBHOOK_GLOBAL_URL:-http://gateway/webhooks/evolution/}
       WEBHOOK_GLOBAL_ENABLED: "true"
-      WEBHOOK_BY_EVENTS: "true"
+      WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS: "false"
       WEBHOOK_GLOBAL_WEBHOOK_SECRET: ${WEBHOOK_SECRET:-dev-webhook-secret}
+      WEBHOOK_EVENTS_MESSAGES_UPDATE: "true"
+      WEBHOOK_EVENTS_MESSAGES_UPSERT: "true"
+      WEBHOOK_EVENTS_SEND_MESSAGE: "true"
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
       DATABASE_CONNECTION_URI: postgresql://bulkping:bulkping@postgres:5432/evolution

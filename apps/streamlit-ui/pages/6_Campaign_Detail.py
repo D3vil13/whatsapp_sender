@@ -56,9 +56,28 @@ st.bar_chart(funnel)
 
 st.divider()
 
+by_status = stats.get("by_status", {})
+st.subheader("Per-contact breakdown by status")
+for status_name in ("failed", "pending", "sent", "delivered", "read"):
+    contacts = by_status.get(status_name, [])
+    label = f"{status_name.title()} ({len(contacts)})"
+    if status_name == "failed":
+        expand = True
+    else:
+        expand = False
+    if contacts:
+        with st.expander(label, expanded=expand):
+            for c in contacts:
+                ts = c.get("status_updated_at") or ""
+                st.text(f"{c['contact_name']} — {c['contact_phone']}  ({ts})")
+    else:
+        st.markdown(f"**{label}**: —")
+
+st.divider()
+
 logs = stats.get("logs", [])
 if logs:
-    st.subheader("Per-contact delivery log")
+    st.subheader("Full delivery log")
     st.dataframe(pd.DataFrame(logs), use_container_width=True)
 else:
     st.info("No message logs yet.")

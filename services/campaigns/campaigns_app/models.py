@@ -44,6 +44,7 @@ class MessageLog(models.Model):
     contact_name = models.CharField(max_length=255)
     contact_phone = models.CharField(max_length=20)
     wa_message_id = models.CharField(max_length=128, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20, choices=MessageStatus.choices, default=MessageStatus.PENDING
     )

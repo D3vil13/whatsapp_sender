@@ -19,11 +19,13 @@ def _client(base_url: str) -> ServiceClient:
 def _post_raw(url: str, json: dict) -> None:
     cfg = settings.BULKPING_CONFIG
     with httpx.Client(timeout=30.0) as client:
-        client.post(
+        resp = client.post(
             url,
             json=json,
             headers={"X-Internal-Token": cfg.internal_service_token},
         )
+        if resp.status_code >= 400:
+            logger.error("_post_raw to %s returned %s: %s", url, resp.status_code, resp.text[:500])
 
 
 def handle_connection_update(payload: dict[str, Any]) -> None:
@@ -106,6 +108,13 @@ def handle_messages_upsert(payload: dict[str, Any]) -> None:
         if not sender.startswith("+"):
             sender = f"+{sender}"
 
+        # Track reply count — every incoming message from a campaign recipient counts
+        _post_raw(
+            f"{cfg.campaigns_service_url}/internal/campaigns/logs/by-phone/reply/",
+            {"sender_phone": sender},
+        )
+
+        # Check chatbot rules for auto-reply
         with httpx.Client(timeout=30.0) as client:
             resp = client.post(
                 f"{cfg.chatbot_service_url}/internal/chatbot/match/",
