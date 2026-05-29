@@ -176,6 +176,15 @@ services:
       redis:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+
   streamlit-ui:
     build:
       context: .

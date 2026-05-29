@@ -1,0 +1,135 @@
+{
+  "name": "BulkPing Dark",
+  "version": "1.0.0",
+  "colors": {
+    "brand": {
+      "primary": "#075E54",
+      "primaryHover": "#0B7E6D",
+      "accent": "#00A884",
+      "accentHover": "#06CF9E"
+    },
+    "sidebar": {
+      "bg": "#111B21",
+      "bgHover": "#1F2C33",
+      "bgActive": "#2A3942",
+      "text": "#E9EDEF",
+      "textSecondary": "#8696A0",
+      "icon": "#8696A0",
+      "border": "#313D45",
+      "width": "280px",
+      "collapsedWidth": "72px"
+    },
+    "header": {
+      "bg": "#1F2C33",
+      "text": "#E9EDEF",
+      "border": "#313D45",
+      "height": "60px"
+    },
+    "main": {
+      "bg": "#0B141A",
+      "cardBg": "#1F2C33",
+      "cardBorder": "#313D45",
+      "text": "#E9EDEF",
+      "textSecondary": "#8696A0",
+      "textMuted": "#667781"
+    },
+    "status": {
+      "connected": "#25D366",
+      "disconnected": "#EF5350",
+      "pending": "#FFA726",
+      "qrPending": "#42A5F5"
+    },
+    "messageStatus": {
+      "sent": "#42A5F5",
+      "delivered": "#66BB6A",
+      "read": "#25D366",
+      "failed": "#EF5350",
+      "pending": "#FFA726"
+    },
+    "input": {
+      "bg": "#2A3942",
+      "border": "#313D45",
+      "text": "#E9EDEF",
+      "placeholder": "#8696A0",
+      "focusBorder": "#00A884"
+    },
+    "button": {
+      "primary": "#00A884",
+      "primaryHover": "#06CF9E",
+      "primaryText": "#FFFFFF",
+      "secondary": "#2A3942",
+      "secondaryHover": "#374A57",
+      "secondaryText": "#E9EDEF",
+      "danger": "#EF5350",
+      "dangerHover": "#E53935",
+      "dangerText": "#FFFFFF"
+    },
+    "chart": {
+      "sent": "#42A5F5",
+      "delivered": "#66BB6A",
+      "read": "#25D366",
+      "failed": "#EF5350",
+      "pending": "#FFA726",
+      "replied": "#AB47BC"
+    },
+    "footer": {
+      "bg": "#111B21",
+      "text": "#8696A0",
+      "border": "#1F2C33",
+      "height": "56px"
+    }
+  },
+  "typography": {
+    "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "fontSize": {
+      "xs": "11px",
+      "sm": "13px",
+      "base": "15px",
+      "lg": "17px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "30px"
+    },
+    "fontWeight": {
+      "normal": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    }
+  },
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px"
+  },
+  "borderRadius": {
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "50%"
+  },
+  "shadow": {
+    "sm": "0 1px 2px rgba(0,0,0,0.3)",
+    "md": "0 2px 8px rgba(0,0,0,0.4)",
+    "lg": "0 4px 16px rgba(0,0,0,0.5)"
+  },
+  "transition": {
+    "fast": "150ms ease",
+    "normal": "250ms ease",
+    "slow": "400ms ease"
+  },
+  "layout": {
+    "maxWidth": "1440px",
+    "sidebarCollapsedWidth": "72px",
+    "sidebarExpandedWidth": "280px"
+  },
+  "meta": {
+    "title": "BulkPing",
+    "description": "WhatsApp BSP Dashboard",
+    "favicon": "/assets/icons/favicon.svg"
+  }
+}
