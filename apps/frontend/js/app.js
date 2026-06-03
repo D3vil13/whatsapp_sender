@@ -560,9 +560,9 @@ const connectPage = {
     qrEl.innerHTML = '<div class="loading"><div class="spinner"></div> Generating QR...</div>';
     try {
       const data = await api.post('/api/instance/create/');
-      const qr = data.qr_base64;
+      const qr = (data.qr_base64 || '').replace(/\s/g, '');
       if (qr) {
-        qrEl.innerHTML = `<img src="data:image/png;base64,${qr}" class="qr-image" alt="QR Code"/>`;
+        qrEl.innerHTML = `<img src="data:image/png;base64,${qr}" class="qr-image" alt="QR Code" onerror="this.parentElement.innerHTML='<div class=alert-alert-warning>QR failed to load. Try again.</div>'"/>`;
         this.startPolling();
       } else {
         qrEl.innerHTML = '<div class="alert alert-warning">No QR returned. Try again.</div>';

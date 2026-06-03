@@ -10,13 +10,16 @@ def extract_qr_base64(payload: dict[str, Any]) -> str | None:
     if not payload:
         return None
     qrcode = payload.get("qrcode")
+    raw = None
     if isinstance(qrcode, dict):
-        qr = qrcode.get("base64")
-        if qr:
-            return qr
-    if payload.get("base64"):
-        return payload["base64"]
-    return None
+        raw = qrcode.get("base64") or qrcode.get("code")
+    elif isinstance(qrcode, str):
+        raw = qrcode
+    if not raw:
+        raw = payload.get("base64")
+    if raw:
+        raw = raw.replace("data:image/png;base64,", "").replace("\n", "").replace("\r", "").replace(" ", "")
+    return raw
 
 
 class EvolutionAPIClient:
