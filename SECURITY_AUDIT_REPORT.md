@@ -1,0 +1,168 @@
+# Security Audit Report
+
+**Project:** BulkPing WhatsApp Sender (BSP)
+**Date:** 2026-05-29
+**Tools Used:** Semgrep v1.164.0, Trivy v0.70.0
+**Scanned By:** Dev Shah
+
+---
+
+## 1. Semgrep Results (SAST — Static Analysis)
+
+Scanned **101 files** (99 Python, 2 JavaScript) with **219 rules**.
+
+### Finding 1: CSV Injection (CWE-1236)
+
+| Attribute | Value |
+|---|---|
+| **Severity** | ERROR (Medium Impact, Medium Likelihood) |
+| **Rule** | `python.django.security.injection.csv-writer-injection.csv-writer-injection` |
+| **File** | `services/campaigns/campaigns_app/views.py:151` |
+| **CWE** | CWE-1236: Improper Neutralization of Formula Elements in a CSV File |
+| **OWASP** | A01:2017 Injection, A03:2021 Injection, A05:2025 Injection |
+
+**Description:**
+User-supplied data is written to a CSV file using the built-in `csv` module without sanitization. If the CSV is opened in a spreadsheet application (Excel, LibreOffice Calc), an attacker could inject formulas (e.g., `=CMD`, `=EXEC`) that execute arbitrary commands on the importing user's machine.
+
+**Vulnerable Code:**
+```python
+# services/campaigns/campaigns_app/views.py:151-156
+writer.writerow([
+    log.contact_name,
+    log.contact_phone,
+    log.status,
+    log.status_updated_at.isoformat() if log.status_updated_at else "",
+])
+```
+
+**Remediation:**
+- Replace `import csv` with `import defusedcsv` (drop-in replacement)
+- Or sanitize fields that start with `=`, `+`, `-`, `@`, or `\t`
+
+**Reference:** https://owasp.org/www-community/attacks/CSV_Injection
+
+### Other Semgrep Observations
+
+- No other vulnerabilities found in project source code.
+- 29 findings in `venv/` (third-party packages like pip, urllib3, graphify) were excluded as they are not project code.
+
+---
+
+## 2. Trivy Results (Dependency & Secret Scanning)
+
+**Trivy Version:** 0.70.0
+**Vulnerability DB:** Downloaded fresh from `mirror.gcr.io/aquasec/trivy-db:2`
+**Scan Type:** `filesystem` (repository mode)
+**Scanners Used:** `vuln` (vulnerabilities), `secret` (hardcoded secrets)
+
+### 2.1 Vulnerability Scan
+
+Scanned **4** pip `requirements.txt` files across services.
+
+| Service | Dependencies Scanned | Vulnerabilities Found |
+|---|---|---|
+| `services/campaigns/requirements.txt` | celery 5.4.0, redis 5.2.1 | None |
+| `services/instance/requirements.txt` | redis 5.2.1 | None |
+| `services/webhook/requirements.txt` | celery 5.4.0, redis 5.2.1 | None |
+| `services/worker/requirements.txt` | celery 5.4.0, redis 5.2.1 | None |
+
+**Result:** No known CVEs found for the detected dependency versions.
+
+### 2.2 Secret Scanning
+
+Scanned the entire repository for hardcoded secrets (API keys, tokens, passwords, private keys, etc.) using Trivy's built-in secret detection rules.
+
+| Category | Secrets Found |
+|---|---|
+| Hardcoded Secrets | **None** |
+| Private Keys | **None** |
+| API Tokens / Passwords | **None** |
+| Connection Strings | **None** |
+
+**Result:** No secrets detected in the repository.
+
+### 2.3 Dependency Tree
+
+| Package | Version | Found In |
+|---|---|---|
+| celery | 5.4.0 | campaigns, webhook, worker |
+| redis | 5.2.1 | campaigns, instance, webhook, worker |
+
+### 2.4 Raw Trivy Output (Vulnerability Scan)
+
+```json
+{
+  "SchemaVersion": 2,
+  "Trivy": { "Version": "0.70.0" },
+  "ArtifactName": "C:/Users/d3vsh/Downloads/bsp",
+  "ArtifactType": "repository",
+  "Results": [
+    {
+      "Target": "services/campaigns/requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        { "Name": "celery", "Version": "5.4.0" },
+        { "Name": "redis", "Version": "5.2.1" }
+      ]
+    },
+    {
+      "Target": "services/instance/requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        { "Name": "redis", "Version": "5.2.1" }
+      ]
+    },
+    {
+      "Target": "services/webhook/requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        { "Name": "celery", "Version": "5.4.0" },
+        { "Name": "redis", "Version": "5.2.1" }
+      ]
+    },
+    {
+      "Target": "services/worker/requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        { "Name": "celery", "Version": "5.4.0" },
+        { "Name": "redis", "Version": "5.2.1" }
+      ]
+    }
+  ]
+}
+```
+
+### 2.5 Commands Used
+
+```powershell
+# Vulnerability scan
+trivy filesystem --format json --severity CRITICAL,HIGH,MEDIUM .
+
+# Secret scan
+trivy filesystem --scanners secret .
+```
+
+---
+
+## 3. Summary
+
+### Findings Overview
+
+| Tool | Category | Severity | Count | Action Required |
+|---|---|---|---|---|
+| Semgrep | CSV Injection | MEDIUM | 1 | Fix |
+| Trivy | Dependency CVEs | N/A | 0 | Monitor |
+| Trivy | Hardcoded Secrets | N/A | 0 | None |
+
+### Priority Actions
+
+1. **HIGH** — Fix CSV injection in `services/campaigns/campaigns_app/views.py:151` using `defusedcsv` or input sanitization.
+2. **LOW** — Keep dependencies updated by regularly running `trivy filesystem` or integrating it into CI/CD.
+
+---
+
+*Report generated by Semgrep v1.164.0 and Trivy v0.70.0*
