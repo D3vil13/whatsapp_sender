@@ -21,6 +21,7 @@ class ServiceConfig:
     contacts_service_url: str
     campaigns_service_url: str
     chatbot_service_url: str
+    google_client_id: str
 
 
 def _split_hosts(value: str) -> list[str]:
@@ -67,4 +68,5 @@ def load_service_config() -> ServiceConfig:
         chatbot_service_url=os.environ.get(
             "CHATBOT_SERVICE_URL", "http://localhost:8005"
         ),
+        google_client_id=os.environ.get("GOOGLE_CLIENT_ID", ""),
     )

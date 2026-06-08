@@ -28,3 +28,24 @@ class SignupSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    credential = serializers.CharField()
+
+    def validate_credential(self, value: str) -> dict:
+        from django.conf import settings
+        cfg = settings.BULKPING_CONFIG
+        if not cfg.google_client_id:
+            raise serializers.ValidationError("Google OAuth is not configured.")
+        try:
+            from google.oauth2 import id_token
+            from google.auth.transport import requests
+            info = id_token.verify_oauth2_token(
+                value, requests.Request(), cfg.google_client_id
+            )
+        except ValueError as exc:
+            raise serializers.ValidationError(f"Invalid Google token: {exc}")
+        if info.get("email_verified") is not True:
+            raise serializers.ValidationError("Google email not verified.")
+        return info

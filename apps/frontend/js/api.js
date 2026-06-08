@@ -99,4 +99,13 @@ const api = {
     localStorage.setItem('bp_refresh', data.refresh);
     return data;
   },
+
+  async googleLogin(credential) {
+    const data = await this.post('/api/auth/google/', { credential });
+    this.token = data.access;
+    this.refreshToken = data.refresh;
+    localStorage.setItem('bp_token', data.access);
+    localStorage.setItem('bp_refresh', data.refresh);
+    return data;
+  },
 };

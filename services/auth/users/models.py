@@ -23,6 +23,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
+    google_sub = models.CharField(max_length=128, unique=True, null=True, blank=True, default=None)
     disclaimer_accepted = models.BooleanField(default=False)
     disclaimer_accepted_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)

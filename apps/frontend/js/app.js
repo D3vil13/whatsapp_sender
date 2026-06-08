@@ -190,6 +190,11 @@ const app = {
         <div class="login-logo">BP</div>
         <div class="login-title">BulkPing</div>
         <div class="login-subtitle">WhatsApp BSP Dashboard</div>
+        <div id="g_id_onload" style="display:none"></div>
+        <div class="google-btn-wrapper">
+          <div id="g_id_button"></div>
+        </div>
+        <div class="login-divider"><span>or</span></div>
         <div class="tabs" id="login-tabs">
           <div class="tab active" data-tab="login">Login</div>
           <div class="tab" data-tab="signup">Sign Up</div>
@@ -230,6 +235,41 @@ const app = {
     document.getElementById('signup-pass').onkeydown = e => { if (e.key === 'Enter') this.signup(); };
     document.querySelectorAll('#login-tabs .tab').forEach(t => {
       t.onclick = () => this.switchAuthTab(t.dataset.tab);
+    });
+
+    this.initGoogleSignIn();
+  },
+
+  async initGoogleSignIn() {
+    if (typeof google === 'undefined' || !google.accounts) return;
+    try {
+      const cfg = await api.get('/api/auth/config/');
+      const clientId = cfg.google_client_id;
+      if (!clientId) return;
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: this.handleGoogleCredential.bind(this),
+        cancel_on_tap_outside: false,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('g_id_button'),
+        { theme: 'outline', size: 'large', width: '100%', text: 'signin_with' }
+      );
+    } catch {}
+  },
+
+  handleGoogleCredential(response) {
+    const btn = document.getElementById('g_id_button');
+    if (btn) btn.style.pointerEvents = 'none';
+    api.googleLogin(response.credential).then(() => {
+      document.getElementById('shell-login').classList.add('hidden');
+      location.hash = '#/dashboard';
+    }).catch(err => {
+      const el = document.getElementById('login-error');
+      el.textContent = err.message;
+      el.classList.remove('hidden');
+    }).finally(() => {
+      if (btn) btn.style.pointerEvents = '';
     });
   },
 

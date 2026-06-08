@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from bulkping_common.auth import JWTService, TokenPayload
 
-from users.serializers import LoginSerializer, SignupSerializer
+from users.serializers import GoogleAuthSerializer, LoginSerializer, SignupSerializer
 
 
 def _jwt_service() -> JWTService:
@@ -102,6 +102,52 @@ class TokenRefreshView(APIView):
                 {"detail": "User not found"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+        return _token_response(user)
+
+
+class ConfigView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        cfg = settings.BULKPING_CONFIG
+        return Response({
+            "google_client_id": cfg.google_client_id,
+        })
+
+
+class GoogleLoginView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        from django.utils import timezone
+        from users.models import User
+
+        serializer = GoogleAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        info = serializer.validated_data["credential"]
+
+        google_sub = info["sub"]
+        email = info.get("email", "")
+
+        user = User.objects.filter(google_sub=google_sub).first()
+        if not user:
+            user = User.objects.filter(email=email).first()
+            if user:
+                user.google_sub = google_sub
+                user.save(update_fields=["google_sub"])
+
+        if not user:
+            user = User(
+                email=email,
+                google_sub=google_sub,
+                disclaimer_accepted=True,
+                disclaimer_accepted_at=timezone.now(),
+            )
+            user.set_unusable_password()
+            user.save()
+
         return _token_response(user)
 
 

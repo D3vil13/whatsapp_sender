@@ -977,6 +977,33 @@ tr:hover td {
   margin-bottom: var(--space-xl);
 }
 
+.google-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.google-btn-wrapper > div > div {
+  width: 100% !important;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--card-border);
+}
+
 /* --- Expandable / Accordion --- */
 .expander {
   border: 1px solid var(--card-border);
