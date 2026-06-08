@@ -241,7 +241,10 @@ const app = {
   },
 
   async initGoogleSignIn() {
-    if (typeof google === 'undefined' || !google.accounts) return;
+    if (typeof google === 'undefined' || !google.accounts) {
+      setTimeout(() => this.initGoogleSignIn(), 500);
+      return;
+    }
     try {
       const cfg = await api.get('/api/auth/config/');
       const clientId = cfg.google_client_id;
