@@ -35,6 +35,23 @@ class InstanceCreateView(DisclaimerRequiredMixin, APIView):
         instance = services.get_or_create_instance(request.user.id)
         client = services.evolution_client()
         try:
+            # Check current Evolution state
+            state_resp = client.connection_state(instance.instance_name)
+            evo_state = state_resp.get("state") or state_resp.get("instance", {}).get("state")
+            if evo_state == "open":
+                return Response(
+                    {"detail": "Instance is already connected. Disconnect first to get a new QR."},
+                    status=status.HTTP_409_CONFLICT,
+                )
+            if evo_state == "close":
+                try:
+                    client.delete_instance(instance.instance_name)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        try:
             qr = _fetch_qr(client, instance.instance_name)
             if qr:
                 services.store_qr_cache(instance.instance_name, qr)
@@ -68,24 +85,34 @@ class InstanceStatusView(DisclaimerRequiredMixin, APIView):
                     "qr_base64": None,
                 },
             )
-        data = InstanceStatusSerializer(instance).data
         client = services.evolution_client()
+        data = InstanceStatusSerializer(instance).data
 
-        # If local DB says not connected, check actual state from Evolution API
-        if instance.status != InstanceStatus.CONNECTED:
-            try:
-                state_resp = client.connection_state(instance.instance_name)
-                evo_state = state_resp.get("state") or state_resp.get("instance", {}).get("state")
-                if evo_state == "open":
-                    wuid = state_resp.get("wuid", "")
-                    phone = wuid.split("@")[0] if wuid else ""
+        # Always check actual state from Evolution API
+        try:
+            state_resp = client.connection_state(instance.instance_name)
+            evo_state = state_resp.get("state") or state_resp.get("instance", {}).get("state")
+
+            if evo_state == "open":
+                wuid = state_resp.get("wuid", "")
+                phone = wuid.split("@")[0] if wuid else ""
+                needs_update = False
+                if instance.status != InstanceStatus.CONNECTED:
                     instance.status = InstanceStatus.CONNECTED
-                    if phone:
-                        instance.phone_number = phone
+                    needs_update = True
+                if phone and instance.phone_number != phone:
+                    instance.phone_number = phone
+                    needs_update = True
+                if needs_update:
                     instance.save(update_fields=["status", "phone_number"])
-                    data = InstanceStatusSerializer(instance).data
-            except Exception:
-                pass
+                data = InstanceStatusSerializer(instance).data
+            elif evo_state == "close":
+                if instance.status != InstanceStatus.DISCONNECTED:
+                    instance.status = InstanceStatus.DISCONNECTED
+                    instance.save(update_fields=["status"])
+                data = InstanceStatusSerializer(instance).data
+        except Exception:
+            pass
 
         # Attempt to get/refresh QR if still not connected and no cached QR
         if instance.status != InstanceStatus.CONNECTED and not data.get("qr_base64"):

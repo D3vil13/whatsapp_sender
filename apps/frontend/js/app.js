@@ -393,13 +393,7 @@ const app = {
             <p class="qr-hint">Open WhatsApp on your phone → Linked devices → Link a device → Scan this QR code</p>
           </div>
         </div>
-        <div style="flex:1;min-width:300px">
-          <div class="card">
-            <div class="card-header"><span class="card-title">Status Details</span></div>
-            <pre id="connect-json" style="font-size:12px;color:var(--text-muted);overflow:auto;max-height:300px"></pre>
-          </div>
         </div>
-      </div>
     `;
     await connectPage.refresh();
   },
@@ -526,7 +520,6 @@ const connectPage = {
 
   async refresh() {
     const el = document.getElementById('connect-status');
-    const jsonEl = document.getElementById('connect-json');
     if (!el) return;
     el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     try {
@@ -543,7 +536,6 @@ const connectPage = {
           </div>
         </div>
       `;
-      jsonEl.textContent = JSON.stringify(data, null, 2);
       if (connected) {
         if (this.pollTimer) { clearInterval(this.pollTimer); this.pollTimer = null; }
         document.getElementById('connect-qr-section').style.display = 'none';
