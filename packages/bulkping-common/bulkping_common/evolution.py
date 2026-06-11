@@ -6,7 +6,6 @@ import httpx
 
 
 def extract_qr_base64(payload: dict[str, Any]) -> str | None:
-    """Extract QR image base64 from Evolution API create/connect responses."""
     if not payload:
         return None
     qrcode = payload.get("qrcode")
@@ -23,15 +22,14 @@ def extract_qr_base64(payload: dict[str, Any]) -> str | None:
 
 
 class EvolutionAPIClient:
-    """Thin HTTP client for Evolution API v2.3.7."""
-
     def __init__(self, base_url: str, api_key: str, timeout: float = 30.0) -> None:
         self.base_url = base_url.rstrip("/")
         self.headers = {"apikey": api_key, "Content-Type": "application/json"}
+        self._timeout = timeout
 
     def _request(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
         url = f"{self.base_url}{path}"
-        with httpx.Client(timeout=kwargs.pop("timeout", 30.0)) as client:
+        with httpx.Client(timeout=kwargs.pop("timeout", self._timeout)) as client:
             response = client.request(method, url, headers=self.headers, **kwargs)
             response.raise_for_status()
             if response.content:
@@ -40,7 +38,6 @@ class EvolutionAPIClient:
             return {}
 
     def create_instance(self, instance_name: str) -> dict[str, Any]:
-        """Create instance. Webhook is configured via Evolution env (WEBHOOK_GLOBAL_URL)."""
         return self._request(
             "POST",
             "/instance/create",
@@ -70,7 +67,7 @@ class EvolutionAPIClient:
         return self._request(
             "POST",
             f"/message/sendText/{instance_name}",
-            json={"number": number, "text": text},
+            json={"number": number, "text": text, "options": {"delay": 1200}},
         )
 
     def send_media(
@@ -78,7 +75,8 @@ class EvolutionAPIClient:
         instance_name: str,
         number: str,
         media_url: str,
-        caption: str,
+        caption: str = "",
+        mediatype: str = "image",
         mimetype: str = "image/jpeg",
     ) -> dict[str, Any]:
         return self._request(
@@ -86,9 +84,60 @@ class EvolutionAPIClient:
             f"/message/sendMedia/{instance_name}",
             json={
                 "number": number,
-                "mediatype": "image",
+                "mediatype": mediatype,
                 "mimetype": mimetype,
                 "media": media_url,
                 "caption": caption,
+                "options": {"delay": 1200},
             },
         )
+
+    def send_list(
+        self,
+        instance_name: str,
+        number: str,
+        title: str = "",
+        description: str = "",
+        button_text: str = "Select",
+        sections: list[dict[str, Any]] | None = None,
+        footer: str = "",
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {
+            "number": number,
+            "options": {"delay": 1200},
+        }
+        list_message: dict[str, Any] = {}
+        if title:
+            list_message["title"] = title
+        if description:
+            list_message["description"] = description
+        list_message["buttonText"] = button_text
+        if footer:
+            list_message["footerText"] = footer
+        list_message["sections"] = sections or []
+        body["listMessage"] = list_message
+        return self._request("POST", f"/message/sendList/{instance_name}", json=body)
+
+    def send_buttons(
+        self,
+        instance_name: str,
+        number: str,
+        title: str = "",
+        description: str = "",
+        buttons: list[dict[str, Any]] | None = None,
+        footer: str = "",
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {
+            "number": number,
+            "options": {"delay": 1200},
+        }
+        button_message: dict[str, Any] = {}
+        if title:
+            button_message["title"] = title
+        if description:
+            button_message["description"] = description
+        if footer:
+            button_message["footerText"] = footer
+        button_message["buttons"] = buttons or []
+        body["buttonsMessage"] = button_message
+        return self._request("POST", f"/message/sendButtons/{instance_name}", json=body)

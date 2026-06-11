@@ -25,7 +25,7 @@
     "semantic_hash": ""
   },
   "apps/streamlit-ui/pages/3_Connect.py": {
-    "mtime": 1780899163.1166587,
+    "mtime": 1780899842.7023528,
     "ast_hash": "3bc15bd977a6ee3211218b0d0a1847c3",
     "semantic_hash": ""
   },
@@ -55,7 +55,7 @@
     "semantic_hash": ""
   },
   "infra/postgres/init-evolution-db.sql": {
-    "mtime": 1780899163.1136591,
+    "mtime": 1780899842.7023528,
     "ast_hash": "7d2248fe72b0b8ac3bf5e37cd556f931",
     "semantic_hash": ""
   },
@@ -70,12 +70,12 @@
     "semantic_hash": ""
   },
   "packages/bulkping-common/bulkping_common/config.py": {
-    "mtime": 1780487528.376595,
-    "ast_hash": "f9e610c1a3d1a61cfad0508ef5b71527",
+    "mtime": 1780919711.1806307,
+    "ast_hash": "f421785623041fddd2128b3aaea4e097",
     "semantic_hash": ""
   },
   "packages/bulkping-common/bulkping_common/evolution.py": {
-    "mtime": 1780899163.1166587,
+    "mtime": 1780899842.7023528,
     "ast_hash": "bff65fdc81d74586d4ec18c517bf49d6",
     "semantic_hash": ""
   },
@@ -100,7 +100,7 @@
     "semantic_hash": ""
   },
   "scripts/start.ps1": {
-    "mtime": 1780899163.1126568,
+    "mtime": 1780899842.7023528,
     "ast_hash": "d19d35a7a752a414eec5fe5e6cf3bf26",
     "semantic_hash": ""
   },
@@ -130,23 +130,23 @@
     "semantic_hash": ""
   },
   "services/auth/users/models.py": {
-    "mtime": 1780487528.388874,
-    "ast_hash": "252b4644b7e7fb67c2d80528cdfa26e8",
+    "mtime": 1780919741.4060783,
+    "ast_hash": "fef68c0b34d75da35e0efe5bc84e5e25",
     "semantic_hash": ""
   },
   "services/auth/users/serializers.py": {
-    "mtime": 1780487528.388874,
-    "ast_hash": "665999abcca87c8a7be8e87e1a79b919",
+    "mtime": 1780921825.884874,
+    "ast_hash": "d938586c53a91cd2210f9603fdcbb720",
     "semantic_hash": ""
   },
   "services/auth/users/urls.py": {
-    "mtime": 1780487528.388874,
-    "ast_hash": "e6b8855c11085b80877d26c557354ae5",
+    "mtime": 1780919731.004278,
+    "ast_hash": "2fd9e3ae3b4d69ae0575fc2a43fb52b2",
     "semantic_hash": ""
   },
   "services/auth/users/views.py": {
-    "mtime": 1780487528.389897,
-    "ast_hash": "8d384401ef9ab6738ed71ad1dd2e5cb0",
+    "mtime": 1780919729.0251095,
+    "ast_hash": "0348e1a6098b1b3758e8b7ab18ae9ace",
     "semantic_hash": ""
   },
   "services/auth/users/__init__.py": {
@@ -425,8 +425,8 @@
     "semantic_hash": ""
   },
   "services/instance/whatsapp/views.py": {
-    "mtime": 1780899163.1166587,
-    "ast_hash": "562dae1e4f36fb94148af682b0916988",
+    "mtime": 1780900939.7481103,
+    "ast_hash": "0c2415e682d05b12100231c72ac555cc",
     "semantic_hash": ""
   },
   "services/instance/whatsapp/migrations/0001_initial.py": {
@@ -480,7 +480,7 @@
     "semantic_hash": ""
   },
   "services/worker/worker/celeryconfig.py": {
-    "mtime": 1780899163.1126568,
+    "mtime": 1780899842.7023528,
     "ast_hash": "bc9813857b9b8f514fc8dceb4ee15446",
     "semantic_hash": ""
   },
@@ -515,7 +515,7 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1780899163.1106591,
+    "mtime": 1780899842.701355,
     "ast_hash": "8627133edd5abcf71aeb1de854380c06",
     "semantic_hash": ""
   },
@@ -530,12 +530,12 @@
     "semantic_hash": ""
   },
   "services/auth/requirements.txt": {
-    "mtime": 1780487528.3853304,
-    "ast_hash": "857236d3b4cf51bb5ded8cec46cf86f5",
+    "mtime": 1780919711.7284908,
+    "ast_hash": "e16a5c601b13106a9834df6ceb18ff03",
     "semantic_hash": ""
   },
   "services/campaigns/requirements.txt": {
-    "mtime": 1780899163.1146567,
+    "mtime": 1780899842.7023528,
     "ast_hash": "452247e2f26b1cabb5f96a0cdb140079",
     "semantic_hash": ""
   },
@@ -550,17 +550,17 @@
     "semantic_hash": ""
   },
   "services/instance/requirements.txt": {
-    "mtime": 1780899163.1116576,
+    "mtime": 1780899842.701355,
     "ast_hash": "ef25fc7670908f8ab52f9da9324cd147",
     "semantic_hash": ""
   },
   "services/webhook/requirements.txt": {
-    "mtime": 1780899163.1136591,
+    "mtime": 1780899842.7023528,
     "ast_hash": "5211b56ddf00345e04d48154dd690ad7",
     "semantic_hash": ""
   },
   "services/worker/requirements.txt": {
-    "mtime": 1780899163.1166587,
+    "mtime": 1780899842.7023528,
     "ast_hash": "f1d9e58d7fb29f6a15e251313ae07b70",
     "semantic_hash": ""
   },
@@ -570,13 +570,13 @@
     "semantic_hash": ""
   },
   "apps/frontend/js/api.js": {
-    "mtime": 1780487528.2631276,
-    "ast_hash": "f661a382e53df0f8cdf1e62cff61dc31",
+    "mtime": 1780919760.4849963,
+    "ast_hash": "6c45c1c7492f27d28d70408d39f81e0c",
     "semantic_hash": ""
   },
   "apps/frontend/js/app.js": {
-    "mtime": 1780489249.8092408,
-    "ast_hash": "8203c1d4da2490f4a44f4a5428ba9a3d",
+    "mtime": 1780921520.5031834,
+    "ast_hash": "e95786096fc44e36fcbae31b1ad4f244",
     "semantic_hash": ""
   },
   "semgrep_results.json": {
@@ -600,8 +600,23 @@
     "semantic_hash": ""
   },
   "apps/frontend/index.html": {
-    "mtime": 1780487528.2617316,
-    "ast_hash": "46db91708d1bbe5e555b1cab351196d2",
+    "mtime": 1780921484.255085,
+    "ast_hash": "0328b0bc53ccabce7b28a58477a2cf3d",
+    "semantic_hash": ""
+  },
+  "services/auth/users/migrations/0002_add_google_sub.py": {
+    "mtime": 1780901856.9319754,
+    "ast_hash": "e9aa1f07fb8139ffb4b05cbfd682fd58",
+    "semantic_hash": ""
+  },
+  "services/auth/users/migrations/0003_add_clerk_user_id.py": {
+    "mtime": 1780919751.82961,
+    "ast_hash": "2799ad8b9d62588a9c09afd3ea6f185f",
+    "semantic_hash": ""
+  },
+  "- Copy.env.txt": {
+    "mtime": 1779604580.3402133,
+    "ast_hash": "582c3d8e017813b7c398ade16876e930",
     "semantic_hash": ""
   }
 }

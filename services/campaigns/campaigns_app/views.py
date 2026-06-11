@@ -78,7 +78,6 @@ def _campaign_analytics(campaign: Campaign) -> dict:
     logs = campaign.logs.all()
     failed_count = logs.filter(status=MessageStatus.FAILED).count()
     pending_count = logs.filter(status=MessageStatus.PENDING).count()
-    ignored_count = campaign.delivered_count - campaign.read_count
     open_rate = round((campaign.read_count / campaign.delivered_count * 100), 1) if campaign.delivered_count else 0.0
     return {
         "id": str(campaign.id),
@@ -89,7 +88,6 @@ def _campaign_analytics(campaign: Campaign) -> dict:
         "sent_count": campaign.sent_count,
         "delivered_count": campaign.delivered_count,
         "read_count": campaign.read_count,
-        "ignored_count": max(ignored_count, 0),
         "failed_count": failed_count,
         "reply_count": campaign.reply_count,
         "open_rate": open_rate,
@@ -215,6 +213,9 @@ class InternalMessageLogView(APIView):
             Campaign.objects.filter(id=campaign.id).update(sent_count=F("sent_count") + 1)
         elif new_status == MessageStatus.FAILED:
             pass
+        remaining = campaign.logs.filter(status=MessageStatus.PENDING).count()
+        if remaining == 0 and campaign.status == CampaignStatus.SENDING:
+            Campaign.objects.filter(id=campaign.id).update(status=CampaignStatus.COMPLETED)
         return Response({"ok": True})
 
     def get(self, request, log_id):
@@ -245,6 +246,8 @@ class InternalMessageUpdateByWaIdView(APIView):
             log = MessageLog.objects.select_related("campaign").get(wa_message_id=wa_message_id)
         except MessageLog.DoesNotExist:
             return Response(status=404)
+        if log.status == new_status:
+            return Response({"ok": True, "duplicate": True})
         log.status = new_status
         log.status_updated_at = timezone.now()
         log.save(update_fields=["status", "status_updated_at"])
@@ -278,8 +281,9 @@ class InternalReplyByPhoneView(APIView):
         sender_phone = request.data.get("sender_phone", "")
         if not sender_phone:
             return Response({"ok": False, "error": "sender_phone required"}, status=400)
+        normalized = sender_phone.lstrip("+")
         log = (
-            MessageLog.objects.filter(contact_phone=sender_phone, status__in=("delivered", "read"))
+            MessageLog.objects.filter(contact_phone__endswith=normalized, status__in=("delivered", "read"))
             .select_related("campaign")
             .order_by("-created_at")
             .first()

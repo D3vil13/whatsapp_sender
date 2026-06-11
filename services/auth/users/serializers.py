@@ -1,4 +1,6 @@
+import jwt
 from django.utils import timezone
+from jwt import PyJWKClient
 from rest_framework import serializers
 
 from users.models import User
@@ -49,3 +51,26 @@ class GoogleAuthSerializer(serializers.Serializer):
         if info.get("email_verified") is not True:
             raise serializers.ValidationError("Google email not verified.")
         return info
+
+
+class ClerkAuthSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate_token(self, value: str) -> dict:
+        from django.conf import settings
+        cfg = settings.BULKPING_CONFIG
+        if not cfg.clerk_api_url:
+            raise serializers.ValidationError("Clerk is not configured.")
+        try:
+            jwks_url = f"{cfg.clerk_api_url}/.well-known/jwks.json"
+            jwks_client = PyJWKClient(jwks_url)
+            signing_key = jwks_client.get_signing_key_from_jwt(value)
+            payload = jwt.decode(
+                value,
+                signing_key.key,
+                algorithms=["RS256"],
+                options={"verify_aud": False},
+            )
+            return payload
+        except Exception as exc:
+            raise serializers.ValidationError(f"Invalid Clerk token: {exc}")

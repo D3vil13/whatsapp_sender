@@ -5,7 +5,12 @@ from rest_framework.views import APIView
 
 from bulkping_common.auth import JWTService, TokenPayload
 
-from users.serializers import GoogleAuthSerializer, LoginSerializer, SignupSerializer
+from users.serializers import (
+    ClerkAuthSerializer,
+    GoogleAuthSerializer,
+    LoginSerializer,
+    SignupSerializer,
+)
 
 
 def _jwt_service() -> JWTService:
@@ -142,6 +147,43 @@ class GoogleLoginView(APIView):
             user = User(
                 email=email,
                 google_sub=google_sub,
+                disclaimer_accepted=True,
+                disclaimer_accepted_at=timezone.now(),
+            )
+            user.set_unusable_password()
+            user.save()
+
+        return _token_response(user)
+
+
+class ClerkLoginView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        from django.utils import timezone
+        from users.models import User
+
+        serializer = ClerkAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        info = serializer.validated_data["token"]
+
+        clerk_user_id = info.get("sub", "")
+        email = info.get("email", "") or (
+            info.get("payload", {}).get("email", "")
+        )
+
+        user = User.objects.filter(clerk_user_id=clerk_user_id).first()
+        if not user and email:
+            user = User.objects.filter(email=email).first()
+            if user:
+                user.clerk_user_id = clerk_user_id
+                user.save(update_fields=["clerk_user_id"])
+
+        if not user:
+            user = User(
+                email=email or f"{clerk_user_id}@clerk.placeholder",
+                clerk_user_id=clerk_user_id,
                 disclaimer_accepted=True,
                 disclaimer_accepted_at=timezone.now(),
             )

@@ -108,4 +108,13 @@ const api = {
     localStorage.setItem('bp_refresh', data.refresh);
     return data;
   },
+
+  async clerkLogin(token) {
+    const data = await this.post('/api/auth/clerk/', { token });
+    this.token = data.access;
+    this.refreshToken = data.refresh;
+    localStorage.setItem('bp_token', data.access);
+    localStorage.setItem('bp_refresh', data.refresh);
+    return data;
+  },
 };

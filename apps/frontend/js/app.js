@@ -35,6 +35,7 @@ const app = {
               <div id="page-connect" class="page"></div>
               <div id="page-campaigns" class="page"></div>
               <div id="page-contacts" class="page"></div>
+              <div id="page-chatbot" class="page"></div>
               <div id="page-analytics" class="page"></div>
               <div id="page-settings" class="page"></div>
             </div>
@@ -62,6 +63,7 @@ const app = {
         ${this.navItem('connect', 'Connect', '#/connect', this.icon('connect'))}
         ${this.navItem('campaigns', 'Campaigns', '#/campaigns', this.icon('campaigns'))}
         ${this.navItem('contacts', 'Contacts', '#/contacts', this.icon('contacts'))}
+        ${this.navItem('chatbot', 'Chatbot', '#/chatbot', this.icon('chatbot'))}
         ${this.navItem('analytics', 'Analytics', '#/analytics', this.icon('analytics'))}
         <div class="nav-section-label">System</div>
         ${this.navItem('settings', 'Settings', '#/settings', this.icon('settings'))}
@@ -100,7 +102,7 @@ const app = {
   },
 
   updateHeader(page) {
-    const titles = { dashboard: 'Dashboard', connect: 'Connect WhatsApp', campaigns: 'Campaigns', contacts: 'Contacts & Groups', analytics: 'Analytics', settings: 'Settings' };
+    const titles = { dashboard: 'Dashboard', connect: 'Connect WhatsApp', campaigns: 'Campaigns', contacts: 'Contacts & Groups', chatbot: 'Chatbot', analytics: 'Analytics', settings: 'Settings' };
     document.getElementById('page-title').textContent = titles[page] || page;
     document.getElementById('header-actions').innerHTML = page === 'campaigns'
       ? '<button class="btn btn-primary btn-sm" onclick="app.navigate(\'campaigns\');campaigns.openNew()">+ New Campaign</button>'
@@ -127,6 +129,7 @@ const app = {
       '/connect': 'connect',
       '/campaigns': 'campaigns',
       '/contacts': 'contacts',
+      '/chatbot': 'chatbot',
       '/analytics': 'analytics',
       '/settings': 'settings',
       '/campaign-detail': 'campaigns',
@@ -156,6 +159,7 @@ const app = {
       connect: '<svg viewBox="0 0 24 24"><path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.99.99 0 00-1.39 1.06L3.77 12 2.01 19.34a1 1 0 001.39 1.06z"/></svg>',
       campaigns: '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>',
       contacts: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>',
+      chatbot: '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zm-5.5-8c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S13 10.33 13 9.5 13.67 8 14.5 8zm-5 0c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S9 10.33 9 9.5 9.67 8 9.5 8z"/></svg>',
       analytics: '<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>',
       settings: '<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z"/></svg>',
       collapse: '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>',
@@ -190,9 +194,18 @@ const app = {
         <div class="login-logo">BP</div>
         <div class="login-title">BulkPing</div>
         <div class="login-subtitle">WhatsApp BSP Dashboard</div>
-        <div id="g_id_onload" style="display:none"></div>
         <div class="google-btn-wrapper">
-          <div id="g_id_button"></div>
+          <button class="btn btn-google w-full btn-lg" id="clerk-login-btn">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+            Continue with Google
+          </button>
+        </div>
+        <div id="clerk-session" class="hidden" style="margin-bottom:var(--space-md)">
+          <div style="text-align:center;margin-bottom:12px;font-size:var(--font-sm);color:var(--text-muted)">
+            Signed in as <strong id="clerk-session-email" style="color:var(--text-primary)"></strong>
+          </div>
+          <button class="btn btn-primary w-full btn-lg" id="clerk-continue-btn" style="margin-bottom:8px">Continue to Dashboard</button>
+          <button class="btn btn-secondary w-full btn-lg" id="clerk-switch-btn">Use a different account</button>
         </div>
         <div class="login-divider"><span>or</span></div>
         <div class="tabs" id="login-tabs">
@@ -237,43 +250,67 @@ const app = {
       t.onclick = () => this.switchAuthTab(t.dataset.tab);
     });
 
-    this.initGoogleSignIn();
+    this.initClerk();
   },
 
-  async initGoogleSignIn() {
-    if (typeof google === 'undefined' || !google.accounts) {
-      setTimeout(() => this.initGoogleSignIn(), 500);
+  async initClerk() {
+    if (typeof Clerk === 'undefined') {
+      setTimeout(() => this.initClerk(), 300);
       return;
     }
     try {
-      const cfg = await api.get('/api/auth/config/');
-      const clientId = cfg.google_client_id;
-      if (!clientId) return;
-      google.accounts.id.initialize({
-        client_id: clientId,
-        callback: this.handleGoogleCredential.bind(this),
-        cancel_on_tap_outside: false,
-      });
-      google.accounts.id.renderButton(
-        document.getElementById('g_id_button'),
-        { theme: 'outline', size: 'large', width: '100%', text: 'signin_with' }
-      );
+      this._clerk = typeof Clerk === 'function'
+        ? new Clerk('pk_test_ZXhvdGljLWtpdC03MC5jbGVyay5hY2NvdW50cy5kZXYk')
+        : Clerk;
+      if (typeof this._clerk.load !== 'function') {
+        setTimeout(() => this.initClerk(), 300);
+        return;
+      }
+      await this._clerk.load();
+      if (typeof this._clerk.openSignIn !== 'function') {
+        setTimeout(() => this.initClerk(), 500);
+        return;
+      }
+      if (this._clerk.session) {
+        document.getElementById('clerk-login-btn').classList.add('hidden');
+        document.querySelector('.login-divider')?.classList.add('hidden');
+        document.getElementById('clerk-session-email').textContent =
+          this._clerk.user?.primaryEmailAddress?.emailAddress || this._clerk.user?.id || 'Unknown';
+        document.getElementById('clerk-session').classList.remove('hidden');
+        document.getElementById('clerk-continue-btn').onclick = async () => {
+          try {
+            const token = await this._clerk.session.getToken();
+            await api.clerkLogin(token);
+            document.getElementById('shell-login').classList.add('hidden');
+            location.hash = '#/dashboard';
+          } catch (err) {
+            const errEl = document.getElementById('login-error');
+            errEl.textContent = err.message || 'Login failed';
+            errEl.classList.remove('hidden');
+          }
+        };
+        document.getElementById('clerk-switch-btn').onclick = async () => {
+          await this._clerk.signOut();
+          location.reload();
+        };
+        return;
+      }
+      document.getElementById('clerk-login-btn').onclick = async () => {
+        try {
+          await this._clerk.openSignIn();
+          if (!this._clerk.session) return;
+          const token = await this._clerk.session.getToken();
+          await api.clerkLogin(token);
+          document.getElementById('shell-login').classList.add('hidden');
+          location.hash = '#/dashboard';
+        } catch (err) {
+          if (err.message?.includes('User canceled')) return;
+          const el = document.getElementById('login-error');
+          el.textContent = err.errors?.[0]?.message || err.message || 'Google sign-in failed';
+          el.classList.remove('hidden');
+        }
+      };
     } catch {}
-  },
-
-  handleGoogleCredential(response) {
-    const btn = document.getElementById('g_id_button');
-    if (btn) btn.style.pointerEvents = 'none';
-    api.googleLogin(response.credential).then(() => {
-      document.getElementById('shell-login').classList.add('hidden');
-      location.hash = '#/dashboard';
-    }).catch(err => {
-      const el = document.getElementById('login-error');
-      el.textContent = err.message;
-      el.classList.remove('hidden');
-    }).finally(() => {
-      if (btn) btn.style.pointerEvents = '';
-    });
   },
 
   switchAuthTab(tab) {
@@ -495,26 +532,28 @@ const app = {
           <div class="metric-card"><div class="metric-label">Stopped</div><div class="metric-value" style="color:var(--text-muted)">${data.total_stopped || 0}</div></div>
           <div class="metric-card"><div class="metric-label">Open Rate</div><div class="metric-value" style="color:var(--brand-accent)">${data.total_delivered ? Math.round(data.total_read / data.total_delivered * 100) : 0}%</div></div>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">Per-Campaign Analytics</span></div>
+        <div class="card"><div class="card-header"><span class="card-title">Per-Campaign Analytics</span><button class="btn btn-sm btn-secondary" onclick="analytics.refresh()" style="margin-left:auto">Refresh</button></div>
         ${campaigns.length ? `
           <div class="table-container">
             <table>
-              <thead><tr><th>Campaign</th><th>Status</th><th>Total</th><th>Sent</th><th>Delivered</th><th>Read</th><th>Failed</th><th>Ignored</th><th>Replied</th><th>Rate</th><th></th></tr></thead>
-              <tbody>${campaigns.map(c => `
+              <thead><tr><th>Campaign</th><th>Status</th><th>Total</th><th>Sent</th><th>Delivered</th><th>Read</th><th>Failed</th><th>Replied</th><th>Rate</th><th></th></tr></thead>
+              <tbody>${campaigns.map(c => {
+                const badgeStatus = c.stopped ? 'stopped' : c.status;
+                const statusLabel = c.stopped ? 'STOPPED' : c.status === 'completed' ? 'COMPLETED' : c.queued_processing > 0 ? 'SENDING' : c.status;
+                return `
                 <tr>
                   <td style="font-weight:500">${this.esc(c.name)}</td>
-                  <td><span class="badge badge-${c.stopped ? 'stopped' : c.status}">${c.stopped ? 'STOPPED' : c.status}</span></td>
+                  <td><span class="badge badge-${badgeStatus}">${statusLabel}</span></td>
                   <td>${c.total_count || 0}</td>
                   <td style="color:var(--msg-sent)">${c.sent_count || 0}</td>
                   <td style="color:var(--msg-delivered)">${c.delivered_count || 0}</td>
                   <td style="color:var(--msg-read)">${c.read_count || 0}</td>
                   <td style="color:var(--msg-failed)">${c.failed_count || 0}</td>
-                  <td style="color:var(--text-muted)">${c.ignored_count ?? '-'}</td>
                   <td style="color:#AB47BC">${c.reply_count || 0}</td>
                   <td style="color:var(--brand-accent);font-weight:600">${c.open_rate ?? 0}%</td>
-                  <td>${!c.stopped ? `<button class="btn btn-sm btn-danger" onclick="analytics.stopCampaign('${c.campaign_id}')">Stop</button>` : ''}</td>
-                </tr>
-              `).join('')}</tbody>
+                  <td>${!c.stopped ? `<button class="btn btn-sm btn-danger" onclick="analytics.stopCampaign('${c.id}')">Stop</button>` : ''}</td>
+                </tr>`;
+              }).join('')}</tbody>
             </table>
           </div>
           <div style="margin-top:24px">
@@ -524,7 +563,20 @@ const app = {
         </div>
       `;
       if (campaigns.length) analytics.renderFunnel(data);
+      if (analytics._timer) clearTimeout(analytics._timer);
+      if (!data.campaigns?.every(c => c.stopped || c.status === 'completed')) {
+        analytics._timer = setTimeout(() => analytics.refresh(), 15000);
+      }
     } catch (err) { el.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
+  },
+
+  /* --- CHATBOT PAGE --- */
+  async render_chatbot(el) {
+    if (typeof chatbot !== 'undefined' && chatbot.render) {
+      await chatbot.render(el);
+    } else {
+      el.innerHTML = '<div class="alert alert-error">Chatbot module not loaded.</div>';
+    }
   },
 
   /* --- SETTINGS PAGE --- */
@@ -955,6 +1007,11 @@ const contacts = {
 
 /* --- Analytics Page --- */
 const analytics = {
+  _timer: null,
+  refresh() {
+    if (this._timer) clearTimeout(this._timer);
+    app.renderPage('analytics');
+  },
   async stopCampaign(id) {
     if (!confirm('Stop this campaign? This cannot be undone.')) return;
     try { await api.post(`/api/campaigns/${id}/stop/`); app.toast('Campaign stopped'); app.renderPage('analytics'); }

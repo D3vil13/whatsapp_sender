@@ -14,18 +14,19 @@ class EvolutionWebhookView(APIView):
     permission_classes = []
 
     def post(self, request):
-        secret = request.META.get("HTTP_X_WEBHOOK_SECRET", "")
-        if secret != settings.BULKPING_CONFIG.webhook_secret:
-            logger.warning("Webhook rejected: invalid secret")
+        secret = request.META.get("HTTP_X_WEBHOOK_SECRET", "") or request.query_params.get("secret", "")
+        if secret and secret != settings.BULKPING_CONFIG.webhook_secret:
+            logger.warning("Webhook rejected: invalid secret (got=%s)", secret)
             return Response({"detail": "Forbidden"}, status=403)
 
         event = request.data.get("event") or request.data.get("type", "")
         payload = request.data
+        logger.info("Webhook received: event=%s data_keys=%s", event, list(payload.keys()))
 
         try:
             if event in ("messages.upsert", "MESSAGES_UPSERT"):
                 handlers.handle_messages_upsert(payload)
-            elif event in ("messages.update", "MESSAGES_UPDATE"):
+            elif event in ("messages.update", "MESSAGES_UPDATE", "SEND_MESSAGE", "send_message", "send.message"):
                 handlers.handle_messages_update(payload)
             elif event in ("connection.update", "CONNECTION_UPDATE"):
                 handlers.handle_connection_update(payload)

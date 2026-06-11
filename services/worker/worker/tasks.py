@@ -18,6 +18,7 @@ def _cfg() -> dict[str, str]:
         "internal_token": os.environ["INTERNAL_SERVICE_TOKEN"],
         "instance_url": os.environ.get("INSTANCE_SERVICE_URL", "http://instance-service:8002"),
         "campaigns_url": os.environ.get("CAMPAIGNS_SERVICE_URL", "http://campaigns-service:8004"),
+        "chatbot_url": os.environ.get("CHATBOT_SERVICE_URL", "http://chatbot-service:8005"),
         "evolution_url": os.environ.get("EVOLUTION_API_URL", "http://evolution-api:8080"),
         "evolution_key": os.environ.get("EVOLUTION_API_KEY", ""),
     }
@@ -109,7 +110,17 @@ def send_broadcast_message(self, log_id: str) -> None:
 
 
 @shared_task(name="worker.tasks.send_chatbot_reply")
-def send_chatbot_reply(user_id: str, sender_phone: str, reply_text: str) -> None:
+def send_chatbot_reply(
+    user_id: str,
+    sender_phone: str,
+    reply_text: str = "",
+    response_type: str = "text",
+    menu_config: dict | None = None,
+    attachment_url: str = "",
+    rule_id: str | None = None,
+    flow_id: str | None = None,
+    branches: dict | None = None,
+) -> None:
     cfg = _cfg()
     uid = uuid.UUID(user_id)
     instance_svc = ServiceClient(cfg["instance_url"], cfg["internal_token"])
@@ -118,11 +129,63 @@ def send_chatbot_reply(user_id: str, sender_phone: str, reply_text: str) -> None
     except Exception as exc:
         logger.error("No instance for chatbot reply: %s", exc)
         return
+
     evolution = EvolutionAPIClient(cfg["evolution_url"], cfg["evolution_key"])
     phone = sender_phone.lstrip("+")
+
     try:
-        evolution.send_text(instance["instance_name"], phone, reply_text)
+        if response_type == "text":
+            evolution.send_text(instance["instance_name"], phone, reply_text)
+
+        elif response_type == "list_menu":
+            menu = menu_config or {}
+            evolution.send_list(
+                instance["instance_name"],
+                phone,
+                title=menu.get("title", ""),
+                description=menu.get("description", ""),
+                button_text=menu.get("button_text", "Select"),
+                sections=menu.get("sections", []),
+                footer=menu.get("footer", ""),
+            )
+            # Send text preface before menu if present
+            if reply_text:
+                evolution.send_text(instance["instance_name"], phone, reply_text)
+
+        elif response_type == "buttons":
+            menu = menu_config or {}
+            evolution.send_buttons(
+                instance["instance_name"],
+                phone,
+                title=menu.get("title", ""),
+                description=menu.get("description", ""),
+                buttons=menu.get("buttons", []),
+                footer=menu.get("footer", ""),
+            )
+            if reply_text:
+                evolution.send_text(instance["instance_name"], phone, reply_text)
+
+        elif response_type in ("image", "document", "audio", "video"):
+            mimetype_map = {
+                "image": "image/jpeg",
+                "document": "application/pdf",
+                "audio": "audio/mpeg",
+                "video": "video/mp4",
+            }
+            evolution.send_media(
+                instance["instance_name"],
+                phone,
+                attachment_url,
+                caption=reply_text,
+                mediatype=response_type,
+                mimetype=mimetype_map.get(response_type, "image/jpeg"),
+            )
+
+        else:
+            evolution.send_text(instance["instance_name"], phone, reply_text)
+
         instance_svc.post(f"/internal/instance/users/{uid}/increment-sent/", user_id=uid)
+        logger.info("Chatbot reply sent (type=%s) to %s", response_type, phone)
     except Exception as exc:
         logger.error("Chatbot reply failed: %s", exc)
 

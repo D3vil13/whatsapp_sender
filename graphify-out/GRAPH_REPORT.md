@@ -1,16 +1,16 @@
-# Graph Report - bsp  (2026-06-08)
+# Graph Report - bsp  (2026-06-11)
 
 ## Corpus Check
-- 111 files · ~15,133 words
+- 113 files · ~15,929 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 741 nodes · 1096 edges · 131 communities (115 shown, 16 thin omitted)
-- Extraction: 84% EXTRACTED · 16% INFERRED · 0% AMBIGUOUS · INFERRED: 173 edges (avg confidence: 0.56)
+- 751 nodes · 1147 edges · 132 communities (114 shown, 18 thin omitted)
+- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 206 edges (avg confidence: 0.55)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `115d412d`
+- Built from commit: `dd1b2af3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -68,18 +68,19 @@
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 131|Community 131]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `InternalServiceAuthentication` - 40 edges
-2. `DisclaimerRequiredMixin` - 37 edges
-3. `EvolutionAPIClient` - 31 edges
-4. `JWTService` - 20 edges
-5. `TokenPayload` - 18 edges
-6. `ServiceClient` - 14 edges
-7. `User` - 14 edges
-8. `time` - 13 edges
-9. `BulkPingAPI` - 12 edges
-10. `SignupSerializer` - 12 edges
+1. `InternalServiceAuthentication` - 39 edges
+2. `DisclaimerRequiredMixin` - 36 edges
+3. `EvolutionAPIClient` - 30 edges
+4. `JWTService` - 23 edges
+5. `TokenPayload` - 21 edges
+6. `User` - 20 edges
+7. `SignupSerializer` - 15 edges
+8. `ServiceClient` - 14 edges
+9. `time` - 13 edges
+10. `LoginSerializer` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `DisclaimerRequiredMixin` --uses--> `TokenPayload`  [INFERRED]
@@ -97,27 +98,27 @@
 - 1-file cycle: `services/campaigns/campaigns_app/services.py -> services/campaigns/campaigns_app/services.py`
 - 1-file cycle: `services/campaigns/campaigns_app/tasks_client.py -> services/campaigns/campaigns_app/tasks_client.py`
 
-## Communities (131 total, 16 thin omitted)
+## Communities (132 total, 18 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (42): APIView, Campaign, _campaign_analytics(), CampaignAnalyticsView, CampaignExportView, CampaignListCreateView, CampaignStatsView, CampaignStopView (+34 more)
+Cohesion: 0.07
+Nodes (38): APIView, Campaign, _campaign_analytics(), CampaignAnalyticsView, CampaignExportView, CampaignListCreateView, CampaignStatsView, CampaignStopView (+30 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.08
-Nodes (30): AbstractBaseUser, BaseUserManager, JWTService, TokenPayload, AuthenticatedUser, InternalServiceUser, JWTAuthentication, Lightweight user object from JWT — no cross-service User FK. (+22 more)
+Cohesion: 0.09
+Nodes (33): AbstractBaseUser, BaseUserManager, JWTService, TokenPayload, AuthenticatedUser, InternalServiceUser, JWTAuthentication, Lightweight user object from JWT — no cross-service User FK. (+25 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.13
 Nodes (17): Campaign, CampaignStatus, MessageLog, MessageStatus, Meta, CampaignCreateSerializer, CampaignListSerializer, MessageLogSerializer (+9 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.11
+Cohesion: 0.13
 Nodes (12): Contact, ContactGroup, Meta, ContactCreateSerializer, ContactSerializer, GroupCreateSerializer, GroupMembersSerializer, GroupSerializer (+4 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.11
-Nodes (21): EvolutionAPIClient, extract_qr_base64(), Thin HTTP client for Evolution API v2.3.7., Thin HTTP client for Evolution API v2.3.7., Create instance. Webhook is configured via Evolution env (WEBHOOK_GLOBAL_URL)., Create instance. Webhook is configured via Evolution env (WEBHOOK_GLOBAL_URL)., Extract QR image base64 from Evolution API create/connect responses., daily_cap_for_warmup_day() (+13 more)
+Cohesion: 0.07
+Nodes (31): EvolutionAPIClient, extract_qr_base64(), Thin HTTP client for Evolution API v2.3.7., Thin HTTP client for Evolution API v2.3.7., Create instance. Webhook is configured via Evolution env (WEBHOOK_GLOBAL_URL)., Create instance. Webhook is configured via Evolution env (WEBHOOK_GLOBAL_URL)., Extract QR image base64 from Evolution API create/connect responses., daily_cap_for_warmup_day() (+23 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.16
@@ -126,10 +127,6 @@ Nodes (20): ServiceClient, broadcast_hours_warning(), contacts_client(), fetch_g
 ### Community 6 - "Community 6"
 Cohesion: 0.12
 Nodes (7): Any, bool, str, str, bytes, BulkPingAPI, decode_qr()
-
-### Community 7 - "Community 7"
-Cohesion: 0.19
-Nodes (7): str, WAInstance, InstanceStatus, Meta, WAInstance, InstanceStatusSerializer, Meta
 
 ### Community 8 - "Community 8"
 Cohesion: 0.14
@@ -152,12 +149,12 @@ Cohesion: 0.58
 Nodes (9): str, _cfg(), check_instance_health(), _headers(), increment_warmup_day(), _patch_log(), reset_daily_sent_counts(), send_broadcast_message() (+1 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.15
+Cohesion: 0.17
 Nodes (7): ChatbotMatchLog, ChatbotRule, Meta, Metadata only — no message content stored., ChatbotRuleCreateSerializer, ChatbotRuleSerializer, Meta
 
 ### Community 14 - "Community 14"
-Cohesion: 0.29
-Nodes (7): build_settings(), Factory for Django settings shared across BulkPing microservices., load_service_config(), ServiceConfig, _split_hosts(), str, str
+Cohesion: 0.33
+Nodes (6): build_settings(), Factory for Django settings shared across BulkPing microservices., load_service_config(), ServiceConfig, _split_hosts(), str
 
 ### Community 15 - "Community 15"
 Cohesion: 0.12
@@ -212,8 +209,8 @@ Cohesion: 0.29
 Nodes (7): time, fixpoint_timeouts, max_memory_bytes, rules, rules_parse_time, targets, total_bytes
 
 ### Community 91 - "Community 91"
-Cohesion: 0.33
-Nodes (6): accent, accentHover, primary, primaryHover, colors, brand
+Cohesion: 0.40
+Nodes (5): accent, accentHover, primary, primaryHover, brand
 
 ### Community 92 - "Community 92"
 Cohesion: 0.33
@@ -232,8 +229,8 @@ Cohesion: 0.33
 Nodes (6): per_file_and_rule_time, total_time, very_slow_rules_on_files, mean, std_dev, matching_time
 
 ### Community 96 - "Community 96"
-Cohesion: 0.40
-Nodes (5): footer, bg, border, height, text
+Cohesion: 0.33
+Nodes (6): colors, footer, bg, border, height, text
 
 ### Community 97 - "Community 97"
 Cohesion: 0.40
@@ -250,22 +247,22 @@ Nodes (5): config_time, core_time, ignores_time, total_time, profiling_times
 ## Knowledge Gaps
 - **201 isolated node(s):** `name`, `version`, `primary`, `primaryHover`, `accent` (+196 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `EvolutionAPIClient` connect `Community 4` to `Community 0`, `Community 12`?**
   _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Why does `InternalServiceAuthentication` connect `Community 0` to `Community 1`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `InternalServiceAuthentication` connect `Community 0` to `Community 1`, `Community 4`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Why does `DisclaimerRequiredMixin` connect `Community 0` to `Community 1`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Are the 36 inferred relationships involving `InternalServiceAuthentication` (e.g. with `Campaign` and `CampaignAnalyticsView`) actually correct?**
-  _`InternalServiceAuthentication` has 36 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 33 inferred relationships involving `DisclaimerRequiredMixin` (e.g. with `Campaign` and `CampaignAnalyticsView`) actually correct?**
-  _`DisclaimerRequiredMixin` has 33 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 18 inferred relationships involving `EvolutionAPIClient` (e.g. with `EvolutionAPIClient` and `str`) actually correct?**
-  _`EvolutionAPIClient` has 18 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 13 inferred relationships involving `JWTService` (e.g. with `AuthenticatedUser` and `DisclaimerRequiredMixin`) actually correct?**
-  _`JWTService` has 13 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Are the 35 inferred relationships involving `InternalServiceAuthentication` (e.g. with `Campaign` and `CampaignAnalyticsView`) actually correct?**
+  _`InternalServiceAuthentication` has 35 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 32 inferred relationships involving `DisclaimerRequiredMixin` (e.g. with `Campaign` and `CampaignAnalyticsView`) actually correct?**
+  _`DisclaimerRequiredMixin` has 32 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 17 inferred relationships involving `EvolutionAPIClient` (e.g. with `EvolutionAPIClient` and `str`) actually correct?**
+  _`EvolutionAPIClient` has 17 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 16 inferred relationships involving `JWTService` (e.g. with `AuthenticatedUser` and `DisclaimerRequiredMixin`) actually correct?**
+  _`JWTService` has 16 INFERRED edges - model-reasoned connections that need verification._

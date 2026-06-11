@@ -644,6 +644,7 @@ tr:hover td {
 .badge-sending { background: rgba(66, 165, 245, 0.15); color: var(--msg-sent); }
 .badge-completed { background: rgba(37, 211, 102, 0.15); color: var(--msg-read); }
 .badge-stopped { background: rgba(102, 102, 102, 0.15); color: var(--text-muted); }
+.badge-warning { background: rgba(255, 167, 38, 0.15); color: var(--color-pending); }
 
 /* --- Tabs --- */
 .tabs {
@@ -986,6 +987,26 @@ tr:hover td {
 .google-btn-wrapper > div > div {
   width: 100% !important;
 }
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  font-weight: 500;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.btn-google:hover { background: var(--sidebar-bg); border-color: var(--text-muted); }
+.btn-google svg { flex-shrink: 0; }
 
 .login-divider {
   display: flex;
